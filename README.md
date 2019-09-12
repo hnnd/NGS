@@ -1,6 +1,7 @@
 # 高通量测序及数据分析  
 
 ## Linux基础  
+1. [Introduction to Shell](https://github.com/hnnd/NGS/blob/master/linux/intro.md)
 1. [Linux Basic 1](https://github.com/hnnd/NGS/blob/master/linux/basic_1.md)
 2. [Linux Basic 2](https://github.com/hnnd/NGS/blob/master/linux/basic_2.md)
 3. [grep](https://github.com/hnnd/NGS/blob/master/linux/grep.md)
