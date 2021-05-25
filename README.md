@@ -22,7 +22,5 @@
 ## 课程实习模块  
 1. [基因组大小估计与复杂性评估](https://github.com/hnnd/NGS/blob/master/genome/genomescope.md)
 2. [基因组组装之  SPAdes](https://github.com/hnnd/NGS/blob/master/genome/spades.md)
-3. [用Bandage查看组装结果]
 3. [基因组组装（PacBio序列）及注释](https://github.com/hnnd/NGS/blob/master/pacbio_assem.md)  
-4.
 5. [RNA-Seq](https://github.com/hnnd/NGS/blob/master/RNA-Seq.md)  
