@@ -72,6 +72,8 @@ $ cat ../data/*.fastq > reads.fastq
 #$ -N mecat_wang
 #$ -cwd
 #$ -j y
+source /opt/miniconda3/bin/activate
+conda activate ngs
 mecat2pw -j 0 -d reads.fastq -o reads.fastq.pm.can -w wrk_dir -t 4
 mecat2cns -i 0 -t 4 reads.fastq.pm.can reads.fastq corrected_reads.fasta
 extract_sequences corrected_reads.fasta corrected_reads_25x 6500000 25
@@ -174,25 +176,36 @@ $ qsub work.sh
 检查是否已经完成环化。结果存在output目录中，查看文件06.fixstart.detailed.log，环化后的基因组序列文件为06.fixstart.fasta。
 
 ### 4.Genome polishing
-三代测序错误率较高，一般组装后需要进行polish，PacBio序列推荐使用Quiver进行polish。
+三代测序错误率较高，一般组装后需要进行polish，PacBio或nanopore序列可使用racon或NextPolish进行polish，这里以NextPolish为例。
 ```
-# 回到工作目录
-$ mkdir quiver
-$ cd quiver
-$ ln -s ../circle/06.fixstart.fasta ./
-# 第一步align all the reads to the genome
-# 新建一个输入文件列表文件
-$ ls /data/lab/ngs/pacbio/*.h5 > input.fofn
-$ ssh c8 或者ssh c2 或者ssh c3
-$ 回到工作目录
-$ /opt/smrtanalysis/smrtcmds/bin/smrtshell 
-$ pbalign --forQuiver --nproc 4 input.fofn 06.fixstart.fasta reads.cmp.h5
+# 新建polish文件夹
+$ mkdir polish
+$ cd polish
+$ ln -s ../circle/output/06.fixstart.fasta ./raw.genome.fasta
+$ ls /data/lab/ngs/pacbio/*.fastq > lgs.fofn
+# 新建设置文件run.cfg，配置如下：
+[General]
+job_type = sge
+job_prefix = nextPolish
+task = best
+rewrite = yes
+rerun = 3
+parallel_jobs = 6
+multithread_jobs = 5
+genome = ./raw.genome.fasta
+genome_size = auto
+workdir = ./01_rundir
+polish_options = -p {multithread_jobs}
 
-# 第二步,polish
-$ ssh c8 或者ssh c2 或者ssh c3
-$ 回到工作目录
-$ /opt/smrtanalysis/smrtcmds/bin/smrtshell
-$ quiver -j 4 reads.cmp.h5 -r 06.fixstart.fasta -o test.quiver.fasta  -o test.quiver.gff -o test.quiver.fastq
+[lgs_option]
+lgs_fofn = ./lgs.fofn
+lgs_options = -min_read_len 1k -max_depth 100
+lgs_minimap2_options = -x map-pb
+
+# 运行NextPolish
+$ nohup /opt/bio/np/v1.3.1/nextPolish run.cfg &
+# polish后的基因组序列文件：01_rundir/genome.nextpolish.fasta
+
 ```
 Polish完成之后检查test.quiver.fasta序列文件。
 
@@ -202,7 +215,7 @@ Polish完成之后检查test.quiver.fasta序列文件。
 # 回到工作目录
 $ mkdir annotation
 $ cd annotation
-$ ln -s ../quiver/test.quiver.fasta ./genome.fa
+$ ln -s ../polish/01_rundir/genome.nextpolish.fasta ./genome.fa
 $ prokka --outdir GENOME --prefix XXXXX genome.fasta
 ```
 
