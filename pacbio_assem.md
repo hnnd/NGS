@@ -168,7 +168,7 @@ $ ln -s ../mecat/corrected_reads.fasta ./
 #$ -N circ_wang
 #$ -cwd
 #$ -j y
-/opt/bio/miniconda3/envs/py36/bin/circlator all test.contigs.fasta corrected_reads.fasta output
+/opt/bio/miniconda3/envs/ngspy3/bin/circlator all test.contigs.fasta corrected_reads.fasta output
 
 # 提交任务
 $ qsub work.sh
